@@ -12,11 +12,18 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
 public class ResearchPortfolio {
+	
+	String output = "";
+	String stringURL;
 
-	public ResearchPortfolio(String _url){
+	public ResearchPortfolio(String stringURL){
+		this.stringURL = stringURL;
+	}
+	
+	public void load(){
 		URL url = null;
 		try {
-			url = new URL(_url);
+			url = new URL(stringURL);
 		} catch (MalformedURLException e1) {
 			e1.printStackTrace();
 		}
@@ -40,18 +47,21 @@ public class ResearchPortfolio {
 				}
 			}
 			
-			System.out.println(sort(text));
+			output = text;
+			stream.close();
+			doc.close();
 			
 //			stripper.setStartPage(11);
 //			stripper.setEndPage(11); //TODO bug on 11 doesn't find correct title. Finds first. Maybe should find last.
 //			System.out.println(stripper.getText(doc));
 			
-			
-			
-			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public String getText(){
+		return output;
 	}
 	
 	private static String getNumber(String text){
