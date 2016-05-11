@@ -11,7 +11,7 @@ import java.util.Scanner;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
-public class ResearchPortfolio {
+public class ResearchPortfolio implements Source{
 	
 	String output = "";
 	String stringURL;
@@ -20,6 +20,7 @@ public class ResearchPortfolio {
 		this.stringURL = stringURL;
 	}
 	
+	@Override
 	public void load(){
 		URL url = null;
 		try {
@@ -60,6 +61,7 @@ public class ResearchPortfolio {
 		}
 	}
 	
+	@Override
 	public String getText(){
 		return output;
 	}

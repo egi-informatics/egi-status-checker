@@ -1,10 +1,8 @@
 package statuschecker;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -36,6 +34,7 @@ public class View implements ActionListener{
 	ResearchPortfolio rp;
 	
 	static final String rpURL = "http://egi.utah.edu/downloads/research_portfolio/EGI_Research_Portfolio.pdf";
+	static final String jsURL = "http://egi.utah.edu/api/research.json";
 	
 	//Frame size
 	static final int WIDTH = 900;
@@ -56,8 +55,7 @@ public class View implements ActionListener{
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// Sets location to center of screen
-		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		frame.setLocation(dim.width / 2 - frame.getSize().width / 2, dim.height / 2 - frame.getSize().height / 2);
+		frame.setLocationRelativeTo(null);
 		
 		setupRP();
 		setupJSON();
