@@ -4,22 +4,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Scanner;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
-public class ResearchPortfolio implements Source{
+public class ResearchPortfolio extends Source{
 	
-	String output = "";
-	String stringURL;
-
-	public ResearchPortfolio(String stringURL){
-		this.stringURL = stringURL;
+	public ResearchPortfolio(String stringURL) {
+		super(stringURL);
 	}
-	
+
 	@Override
 	public void load(){
 		URL url = null;
@@ -59,11 +54,6 @@ public class ResearchPortfolio implements Source{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	@Override
-	public String getText(){
-		return output;
 	}
 	
 	/**
@@ -113,35 +103,5 @@ public class ResearchPortfolio implements Source{
 		}
 		sc.close();
 		return "";
-	}
-	
-	/**
-	 * Sorts the text by line
-	 */
-	private static String sort(String text){
-		Scanner sc = new Scanner(text);
-		ArrayList<String> list = new ArrayList<>();
-		
-		String result = "";
-		
-		while(sc.hasNext()){
-			list.add(sc.nextLine());
-		}
-
-		Comparator<String> order = new Comparator<String>() {
-			@Override
-			public int compare(String o1, String o2) {
-				return o1.compareTo(o2);
-			}
-		};
-		
-		list.sort(order);
-		
-		for(String line : list){
-			result += line + "\n";
-		}
-		
-		sc.close();
-		return result.trim();
 	}
 }

@@ -32,6 +32,7 @@ public class View implements ActionListener{
 	JButton stButton;
 	
 	ResearchPortfolio rp;
+	MapJS js;
 	
 	static final String rpURL = "http://egi.utah.edu/downloads/research_portfolio/EGI_Research_Portfolio.pdf";
 	static final String jsURL = "http://egi.utah.edu/api/research.json";
@@ -62,6 +63,7 @@ public class View implements ActionListener{
 		setupST();
 		
 		rp = new ResearchPortfolio(rpURL);
+		js = new MapJS(jsURL);
 		
 		frame.setVisible(true);
 	}
@@ -80,7 +82,6 @@ public class View implements ActionListener{
 		
 		rpButton = new JButton("Load Research Portfolio");
 		configureButton(rpButton);
-		rpButton.addActionListener(this);
 		
 		rpPanel.add(rpButton, BorderLayout.NORTH);
 		rpPanel.add(rpText, BorderLayout.CENTER);
@@ -144,6 +145,7 @@ public class View implements ActionListener{
 	
 	private void configureButton(JButton button) {
 		button.setFocusable(false);
+		button.addActionListener(this);
 	}
 
 	@Override
@@ -151,6 +153,14 @@ public class View implements ActionListener{
 		if(e.getSource().equals(rpButton)){
 			rp.load();
 			rpText.setText(rp.getText());
+			return;
 		}
+		
+		if(e.getSource().equals(jsButton)){
+			js.load();
+			jsText.setText(js.getText());
+			return;
+		}
+		
 	}
 }
