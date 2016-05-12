@@ -41,14 +41,14 @@ public class ResearchPortfolio implements Source{
 			for(int i = start; i < end; i++){
 				stripper.setStartPage(i);
 				stripper.setEndPage(i);
-				String tempText = stripper.getText(doc);
-				String line = getNumber(tempText) + "  " + getStatus(tempText);
+				String pageText = stripper.getText(doc);
+				String line = getNumber(pageText) + "  " + getStatus(pageText);
 				if(line.length() > 3){
 					text += line + "\n";
 				}
 			}
 			
-			output = text;
+			output = sort(text);
 			stream.close();
 			doc.close();
 			
@@ -66,8 +66,11 @@ public class ResearchPortfolio implements Source{
 		return output;
 	}
 	
-	private static String getNumber(String text){
-		Scanner sc = new Scanner(text);
+	/**
+	 * Returns the project I # from the input page text
+	 */
+	private static String getNumber(String pageText){
+		Scanner sc = new Scanner(pageText);
 		while(sc.hasNextLine()){
 			String line = sc.nextLine();
 			if(line.startsWith("I 0")){
@@ -83,21 +86,11 @@ public class ResearchPortfolio implements Source{
 		return "";
 	}
 	
-	private static String getTitle(String text){
-		Scanner sc = new Scanner(text);
-		while(sc.hasNextLine()){
-			String line = sc.nextLine();
-			if(Character.isDigit(line.charAt(0)) && line.length() > 4){
-				sc.close();
-				return line.substring(2).trim();
-			}
-		}
-		sc.close();
-		return null;
-	}
-	
-	private static String getStatus(String text){
-		Scanner sc = new Scanner(text);
+	/**
+	 * Returns the project status from the input page text
+	 */
+	private static String getStatus(String pageText){
+		Scanner sc = new Scanner(pageText);
 		
 		String dev = "In Development";
 		String prog = "In Progress";
@@ -106,12 +99,15 @@ public class ResearchPortfolio implements Source{
 		while(sc.hasNextLine()){
 			String line = sc.nextLine();
 			if(line.contains(dev)){
+				sc.close();
 				return dev;
 			}
 			if(line.contains(prog)){
+				sc.close();
 				return prog;
 			}
 			if(line.contains(comp)){
+				sc.close();
 				return comp;
 			}
 		}
@@ -119,48 +115,9 @@ public class ResearchPortfolio implements Source{
 		return "";
 	}
 	
-	private static String onlyTop(String text){
-		Scanner sc = new Scanner(text);
-		String result = "";
-		
-		while(sc.hasNextLine()){
-			String line = sc.nextLine();
-//			if(line.contains("Timetable:"))
-			if(line.contains("Timetable:")){
-				break;
-			}
-			result += line + "\n";
-		}
-		return result;
-	}
-
-	private static String onlyProjects(String text) {
-		Scanner sc = new Scanner(text);
-		String result = "";
-		
-		while(sc.hasNext()){
-			String line = sc.nextLine();
-			if(line.length() > 10 && hasNumbers(line) && hasLetters(line) && notTimeStamp(line)){
-				result += line + "\n";
-			}
-		}
-		sc.close();
-		return result;
-	}
-	
-	private static String cleanUp(String text) {
-		Scanner sc = new Scanner(text);
-		String result = "";
-		
-		while(sc.hasNext()){
-			String line = sc.nextLine();
-			line = line.replaceAll("\\((.*?)\\)", ""); // Removes anything inside ( )
-			result += line.substring(2, line.length()).trim() + "\n";
-		}
-		sc.close();
-		return result.trim();
-	}
-	
+	/**
+	 * Sorts the text by line
+	 */
 	private static String sort(String text){
 		Scanner sc = new Scanner(text);
 		ArrayList<String> list = new ArrayList<>();
@@ -186,29 +143,5 @@ public class ResearchPortfolio implements Source{
 		
 		sc.close();
 		return result.trim();
-	}
-	
-	private static boolean hasNumbers(String line){
-		for(int i = 0; i < line.length(); i++){
-			char ch = line.charAt(i);
-			if(Character.isDigit(ch)){
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	private static boolean hasLetters(String line){
-		for(int i = 0; i < line.length(); i++){
-			char ch = line.charAt(i);
-			if(Character.isLetter(ch)){
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	private static boolean notTimeStamp(String line){
-		return !line.contains(":");
 	}
 }
