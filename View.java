@@ -45,7 +45,7 @@ public class View implements ActionListener{
 	static final String jsURL = "http://egi.utah.edu/api/research.json";
 	
 	//Frame size
-	static final int WIDTH = 900;
+	static final int WIDTH = 800;
 	static final int HEIGHT = 900;
 	
 	static final int TOP = 10;
@@ -193,56 +193,85 @@ public class View implements ActionListener{
 		if(rpText.isEmpty()){
 			return;
 		}
-		
+
 		// Shows what needs to be added to Map JSON
 		append(jsTextPane, "\n\nAdd:\n");
 		Scanner rps = new Scanner(rpText);
-		
-		while(rps.hasNextLine()){
+
+		while (rps.hasNextLine()) {
 			String line = rps.nextLine();
 			String num = getNum(line);
 			boolean hasNum = false;
-			
+
 			Scanner jps = new Scanner(jsText);
-			
-			while(jps.hasNextLine()){
+
+			while (jps.hasNextLine()) {
 				String jsLine = jps.nextLine();
-				if(jsLine.contains(num)){
+				if (jsLine.contains(num)) {
 					hasNum = true;
 					break;
 				}
 			}
-			if(!hasNum){
+			if (!hasNum) {
 				append(jsTextPane, line + "\n");
 			}
 			jps.close();
 		}
 		rps.close();
-		
+
 		// Shows what needs to be removed
 		append(jsTextPane, "\nRemove:\n");
 		Scanner jps = new Scanner(jsText);
-		
-		while(jps.hasNextLine()){
+
+		while (jps.hasNextLine()) {
 			String line = jps.nextLine();
 			String num = getNum(line);
 			boolean hasNum = false;
-			
+
 			rps = new Scanner(rpText);
-			
-			while(rps.hasNextLine()){
+
+			while (rps.hasNextLine()) {
 				String rpLine = rps.nextLine();
-				if(rpLine.contains(num)){
+				if (rpLine.contains(num)) {
 					hasNum = true;
 					break;
 				}
 			}
-			if(!hasNum){
+			if (!hasNum) {
 				append(jsTextPane, line + "\n");
 			}
 			rps.close();
 		}
 		jps.close();
+
+		// Shows what needs to be modified in the Map JSON
+		append(jsTextPane, "\nModify:\n");
+		rps = new Scanner(rpText);
+
+		while (rps.hasNextLine()) {
+			String rpLine = rps.nextLine();
+			String num = getNum(rpLine);
+			boolean hasNum = false;
+			boolean statusMatch = false;
+
+			jps = new Scanner(jsText);
+
+			while (jps.hasNextLine()) {
+				String jsLine = jps.nextLine();
+				if (jsLine.contains(num)) {
+					hasNum = true;
+					if(rpLine.equals(jsLine)){
+						statusMatch = true;
+					}
+					break;
+				}
+			}
+			if (hasNum && !statusMatch) {
+				append(jsTextPane, rpLine + "\n");
+			}
+			jps.close();
+		}
+		rps.close();
 	}
 	
 	private void append(JTextPane pane, String text){
