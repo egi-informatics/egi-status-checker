@@ -3,7 +3,6 @@ package statuschecker;
 public class Main {
 
 	public static void main(String[] args) {
-		new View();
+		View v = new View();
 	}
-
 }

@@ -10,33 +10,35 @@ import java.util.Scanner;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
 public class View implements ActionListener{
 
+	double version = 0.2;
 	JFrame frame;
 	
 	//Panels
-	JPanel top;
-	JPanel bottom;
+	private JPanel top;
+	private JPanel bottom;
 	
-	JPanel rpPanel;
-	JPanel jsPanel;
-	JPanel stPanel;
+	private JPanel rpPanel;
+	private JPanel jsPanel;
+	private JPanel stPanel;
 	
 	//Text
 	JTextPane rpTextPane;
 	JTextPane jsTextPane;
-	JTextPane stText;
+	JTextPane stTextPane;
 	
 	//Buttons
-	JButton rpButton;
-	JButton jsButton;
-	JButton stButton;
-	JButton compareButton;
+	private JButton rpButton;
+	private JButton jsButton;
+	private JButton stButton;
 	
 	ResearchPortfolio rp;
 	MapJS js;
@@ -46,7 +48,7 @@ public class View implements ActionListener{
 	
 	//Frame size
 	static final int WIDTH = 800;
-	static final int HEIGHT = 900;
+	static final int HEIGHT = 800;
 	
 	static final int TOP = 10;
 	static final int BOTTOM = 5;
@@ -79,6 +81,10 @@ public class View implements ActionListener{
 	}
 	
 	private void setupBottom() {
+		bottom.setLayout(new BorderLayout());
+		JLabel versionText = new JLabel(version + "");
+		bottom.setBorder(BorderFactory.createEmptyBorder(0, SIDE, SIDE, SIDE));
+		bottom.add(versionText, BorderLayout.EAST);
 		frame.add(bottom, BorderLayout.SOUTH);
 	}
 
@@ -98,15 +104,10 @@ public class View implements ActionListener{
 		rpPanel.setLayout(layout);
 		rpPanel.setBorder(BorderFactory.createEmptyBorder(TOP, SIDE, BOTTOM, SIDE));
 		
-		rpTextPane = new JTextPane();
-		configureText(rpTextPane);
-		//rpText.setText("Research Portfolio");
-		
 		rpButton = new JButton("Load Research Portfolio");
-		configureButton(rpButton);
-		
-		rpPanel.add(rpButton, BorderLayout.NORTH);
-		rpPanel.add(rpTextPane, BorderLayout.CENTER);
+		rpTextPane = new JTextPane();
+		configureButton(rpButton, rpPanel);
+		configureText(rpTextPane, rpPanel);
 		
 		top.add(rpPanel);
 	}
@@ -120,14 +121,9 @@ public class View implements ActionListener{
 		jsPanel.setBorder(BorderFactory.createEmptyBorder(TOP, 0, BOTTOM, 0)); // no inner padding
 		
 		jsTextPane = new JTextPane();
-		configureText(jsTextPane);
-		//jsText.setText("JSON Map");
-		
 		jsButton = new JButton("Load Map JSON");
-		configureButton(jsButton);
-		
-		jsPanel.add(jsButton, BorderLayout.NORTH);
-		jsPanel.add(jsTextPane, BorderLayout.CENTER);
+		configureText(jsTextPane, jsPanel);
+		configureButton(jsButton, jsPanel);
 		
 		top.add(jsPanel);
 	}
@@ -140,15 +136,10 @@ public class View implements ActionListener{
 		stPanel.setLayout(layout);
 		stPanel.setBorder(BorderFactory.createEmptyBorder(TOP, SIDE, BOTTOM, SIDE));
 		
-		stText = new JTextPane();
-		configureText(stText);
-		//stText.setText("Static Project Text");
-		
+		stTextPane = new JTextPane();
 		stButton = new JButton("Load Static Project Text");
-		configureButton(stButton);
-		
-		stPanel.add(stButton, BorderLayout.NORTH);
-		stPanel.add(stText, BorderLayout.CENTER);
+		configureText(stTextPane, stPanel);
+		configureButton(stButton, stPanel);
 		
 		top.add(stPanel);
 	}
@@ -157,16 +148,21 @@ public class View implements ActionListener{
 		layout.setVgap(10);
 	}
 
-	private void configureText(JTextPane pane) {
-		pane.setEditable(false);
+	private void configureText(JTextPane pane, JPanel panel) {
+		//pane.setEditable(false);
 		//pane.setContentType("text/html");
 		pane.setBorder(BorderFactory.createEmptyBorder(TEXT_PADDING, TEXT_PADDING, TEXT_PADDING, TEXT_PADDING));
 		pane.setFont(Font.getFont(FONT));
+		
+		JScrollPane scroll = new JScrollPane(pane);
+		panel.add(scroll, BorderLayout.CENTER);
 	}
 	
-	private void configureButton(JButton button) {
+	private void configureButton(JButton button, JPanel panel) {
 		button.setFocusable(false);
 		button.addActionListener(this);
+		
+		panel.add(button, BorderLayout.NORTH);
 	}
 
 	@Override
@@ -190,7 +186,7 @@ public class View implements ActionListener{
 		String rpText = rpTextPane.getText();
 		String jsText = jsTextPane.getText();
 		
-		if(rpText.isEmpty()){
+		if(rpText.isEmpty() || !rpText.contains("I 0")){
 			return;
 		}
 
