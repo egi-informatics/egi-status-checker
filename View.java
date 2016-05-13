@@ -5,31 +5,38 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Scanner;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 
 public class View implements ActionListener{
 
 	JFrame frame;
 	
 	//Panels
+	JPanel top;
+	JPanel bottom;
+	
 	JPanel rpPanel;
 	JPanel jsPanel;
 	JPanel stPanel;
 	
 	//Text
-	JTextPane rpText;
-	JTextPane jsText;
+	JTextPane rpTextPane;
+	JTextPane jsTextPane;
 	JTextPane stText;
 	
 	//Buttons
 	JButton rpButton;
 	JButton jsButton;
 	JButton stButton;
+	JButton compareButton;
 	
 	ResearchPortfolio rp;
 	MapJS js;
@@ -39,7 +46,7 @@ public class View implements ActionListener{
 	
 	//Frame size
 	static final int WIDTH = 900;
-	static final int HEIGHT = 640;
+	static final int HEIGHT = 900;
 	
 	static final int TOP = 10;
 	static final int BOTTOM = 5;
@@ -52,15 +59,18 @@ public class View implements ActionListener{
 		frame = new JFrame("Project Status Checker");
 		frame.setSize(WIDTH, HEIGHT);
 		frame.setMinimumSize(frame.getSize());
-		frame.setLayout(new GridLayout(1, 3));
+		frame.setLayout(new BorderLayout());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// Sets location to center of screen
 		frame.setLocationRelativeTo(null);
 		
-		setupRP();
-		setupJSON();
-		setupST();
+		top = new JPanel();
+		setupTop();
+		
+		bottom = new JPanel();
+		setupBottom();
+		
 		
 		rp = new ResearchPortfolio(rpURL);
 		js = new MapJS(jsURL);
@@ -68,6 +78,18 @@ public class View implements ActionListener{
 		frame.setVisible(true);
 	}
 	
+	private void setupBottom() {
+		frame.add(bottom, BorderLayout.SOUTH);
+	}
+
+	private void setupTop() {
+		top.setLayout(new GridLayout(1, 3));
+		setupRP();
+		setupJSON();
+		setupST();
+		frame.add(top, BorderLayout.CENTER);
+	}
+
 	public void setupRP(){
 		rpPanel = new JPanel();
 		BorderLayout layout = new BorderLayout();
@@ -76,18 +98,17 @@ public class View implements ActionListener{
 		rpPanel.setLayout(layout);
 		rpPanel.setBorder(BorderFactory.createEmptyBorder(TOP, SIDE, BOTTOM, SIDE));
 		
-		rpText = new JTextPane();
-		configureText(rpText);
-		rpText.setText("Research Portfolio");
+		rpTextPane = new JTextPane();
+		configureText(rpTextPane);
+		//rpText.setText("Research Portfolio");
 		
 		rpButton = new JButton("Load Research Portfolio");
 		configureButton(rpButton);
 		
 		rpPanel.add(rpButton, BorderLayout.NORTH);
-		rpPanel.add(rpText, BorderLayout.CENTER);
+		rpPanel.add(rpTextPane, BorderLayout.CENTER);
 		
-		
-		frame.add(rpPanel);
+		top.add(rpPanel);
 	}
 	
 	public void setupJSON(){
@@ -98,17 +119,17 @@ public class View implements ActionListener{
 		jsPanel.setLayout(layout);
 		jsPanel.setBorder(BorderFactory.createEmptyBorder(TOP, 0, BOTTOM, 0)); // no inner padding
 		
-		jsText = new JTextPane();
-		configureText(jsText);
-		jsText.setText("JSON Map");
+		jsTextPane = new JTextPane();
+		configureText(jsTextPane);
+		//jsText.setText("JSON Map");
 		
 		jsButton = new JButton("Load Map JSON");
 		configureButton(jsButton);
 		
 		jsPanel.add(jsButton, BorderLayout.NORTH);
-		jsPanel.add(jsText, BorderLayout.CENTER);
+		jsPanel.add(jsTextPane, BorderLayout.CENTER);
 		
-		frame.add(jsPanel);
+		top.add(jsPanel);
 	}
 	
 	public void setupST(){
@@ -121,7 +142,7 @@ public class View implements ActionListener{
 		
 		stText = new JTextPane();
 		configureText(stText);
-		stText.setText("Static Project Text");
+		//stText.setText("Static Project Text");
 		
 		stButton = new JButton("Load Static Project Text");
 		configureButton(stButton);
@@ -129,7 +150,7 @@ public class View implements ActionListener{
 		stPanel.add(stButton, BorderLayout.NORTH);
 		stPanel.add(stText, BorderLayout.CENTER);
 		
-		frame.add(stPanel);
+		top.add(stPanel);
 	}
 	
 	private void configureLayout(BorderLayout layout) {
@@ -152,15 +173,61 @@ public class View implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource().equals(rpButton)){
 			rp.load();
-			rpText.setText(rp.getText());
+			rpTextPane.setText(rp.getText());
 			return;
 		}
 		
 		if(e.getSource().equals(jsButton)){
 			js.load();
-			jsText.setText(js.getText());
+			jsTextPane.setText(js.getText());
+			compare(rpTextPane, jsTextPane);
 			return;
 		}
 		
+	}
+
+	private void compare(JTextPane rpTextPane, JTextPane jsTextPane) {
+		String rpText = rpTextPane.getText();
+		String jsText = jsTextPane.getText();
+		
+		if(rpText.isEmpty()){
+			return;
+		}
+		
+		append(jsTextPane, "\n\nAdd:\n");
+		
+		Scanner rps = new Scanner(rpText);
+		
+		while(rps.hasNextLine()){
+			String line = rps.nextLine();
+			String num = getNum(line);
+			boolean hasNum = false;
+			
+			Scanner jps = new Scanner(jsText);
+			
+			while(jps.hasNextLine()){
+				String jsLine = jps.nextLine();
+				if(jsLine.contains(num)){
+					hasNum = true;
+					break;
+				}
+			}
+			if(!hasNum){
+				append(jsTextPane, line + "\n");
+			}
+		}
+	}
+	
+	private void append(JTextPane pane, String text){
+		Document doc = pane.getDocument();
+		try {
+			doc.insertString(doc.getLength(), text, null);
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private String getNum(String line){
+		return line.split(" ")[1];
 	}
 }
