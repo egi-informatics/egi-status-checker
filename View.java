@@ -194,8 +194,8 @@ public class View implements ActionListener{
 			return;
 		}
 		
+		// Shows what needs to be added to Map JSON
 		append(jsTextPane, "\n\nAdd:\n");
-		
 		Scanner rps = new Scanner(rpText);
 		
 		while(rps.hasNextLine()){
@@ -215,7 +215,34 @@ public class View implements ActionListener{
 			if(!hasNum){
 				append(jsTextPane, line + "\n");
 			}
+			jps.close();
 		}
+		rps.close();
+		
+		// Shows what needs to be removed
+		append(jsTextPane, "\nRemove:\n");
+		Scanner jps = new Scanner(jsText);
+		
+		while(jps.hasNextLine()){
+			String line = jps.nextLine();
+			String num = getNum(line);
+			boolean hasNum = false;
+			
+			rps = new Scanner(rpText);
+			
+			while(rps.hasNextLine()){
+				String rpLine = rps.nextLine();
+				if(rpLine.contains(num)){
+					hasNum = true;
+					break;
+				}
+			}
+			if(!hasNum){
+				append(jsTextPane, line + "\n");
+			}
+			rps.close();
+		}
+		jps.close();
 	}
 	
 	private void append(JTextPane pane, String text){
