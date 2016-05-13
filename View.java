@@ -149,12 +149,13 @@ public class View implements ActionListener{
 	}
 
 	private void configureText(JTextPane pane, JPanel panel) {
-		//pane.setEditable(false);
+		pane.setEditable(false);
 		//pane.setContentType("text/html");
 		pane.setBorder(BorderFactory.createEmptyBorder(TEXT_PADDING, TEXT_PADDING, TEXT_PADDING, TEXT_PADDING));
 		pane.setFont(Font.getFont(FONT));
 		
 		JScrollPane scroll = new JScrollPane(pane);
+		scroll.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 		panel.add(scroll, BorderLayout.CENTER);
 	}
 	
@@ -181,7 +182,11 @@ public class View implements ActionListener{
 		}
 		
 	}
-
+	
+	/**
+	 * Compares two panes. Outputs the result to the second pane.<br>
+	 * Results include projects that need to be added, removed, or modified.
+	 */
 	private void compare(JTextPane rpTextPane, JTextPane jsTextPane) {
 		String rpText = rpTextPane.getText();
 		String jsText = jsTextPane.getText();
@@ -270,6 +275,9 @@ public class View implements ActionListener{
 		rps.close();
 	}
 	
+	/**
+	 * Appends text to the specified text pane
+	 */
 	private void append(JTextPane pane, String text){
 		Document doc = pane.getDocument();
 		try {
@@ -279,6 +287,9 @@ public class View implements ActionListener{
 		}
 	}
 	
+	/**
+	 * Gets the number from the formatted line of text 
+	 */
 	private String getNum(String line){
 		return line.split(" ")[1];
 	}

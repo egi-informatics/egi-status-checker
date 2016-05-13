@@ -1,5 +1,7 @@
 package statuschecker;
 
+import static javax.swing.JOptionPane.showMessageDialog;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -34,6 +36,9 @@ public class MapJS extends Source{
 			s.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+			
+			String message = "Problem with file\n";
+			showMessageDialog(null, message + e.getMessage());
 		}
 	}
 	

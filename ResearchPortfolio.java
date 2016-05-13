@@ -6,7 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
-import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.showMessageDialog;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -56,8 +56,8 @@ public class ResearchPortfolio extends Source{
 		} catch (IOException e) {
 			e.printStackTrace();
 			
-			String message = "Problem with file:\n";
-			JOptionPane.showMessageDialog(null, message + e.getMessage());
+			String message = "Problem with file\n";
+			showMessageDialog(null, message + e.getMessage());
 		}
 	}
 	
