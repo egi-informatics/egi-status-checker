@@ -19,7 +19,7 @@ import javax.swing.text.Document;
 
 public class View implements ActionListener{
 
-	double version = 0.2;
+	double version = 0.3;
 	JFrame frame;
 	
 	//Panels
@@ -42,9 +42,11 @@ public class View implements ActionListener{
 	
 	ResearchPortfolio rp;
 	MapJS js;
+	MapStatic st;
 	
 	static final String rpURL = "http://egi.utah.edu/downloads/research_portfolio/EGI_Research_Portfolio.pdf";
 	static final String jsURL = "http://egi.utah.edu/api/research.json";
+	static final String stURL = "http://egi.utah.edu/research/current-projects/";
 	
 	//Frame size
 	static final int WIDTH = 800;
@@ -76,6 +78,7 @@ public class View implements ActionListener{
 		
 		rp = new ResearchPortfolio(rpURL);
 		js = new MapJS(jsURL);
+		st = new MapStatic(stURL);
 		
 		frame.setVisible(true);
 	}
@@ -137,7 +140,7 @@ public class View implements ActionListener{
 		stPanel.setBorder(BorderFactory.createEmptyBorder(TOP, SIDE, BOTTOM, SIDE));
 		
 		stTextPane = new JTextPane();
-		stButton = new JButton("Load Static Project Text");
+		stButton = new JButton("Load Static Text Below Map");
 		configureText(stTextPane, stPanel);
 		configureButton(stButton, stPanel);
 		
@@ -166,21 +169,23 @@ public class View implements ActionListener{
 		panel.add(button, BorderLayout.NORTH);
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if(e.getSource().equals(rpButton)){
-			rp.load();
-			rpTextPane.setText(rp.getText());
-			return;
+	/**
+	 * Appends text to the specified text pane
+	 */
+	private void append(JTextPane pane, String text){
+		Document doc = pane.getDocument();
+		try {
+			doc.insertString(doc.getLength(), text, null);
+		} catch (BadLocationException e) {
+			e.printStackTrace();
 		}
-		
-		if(e.getSource().equals(jsButton)){
-			js.load();
-			jsTextPane.setText(js.getText());
-			compare(rpTextPane, jsTextPane);
-			return;
-		}
-		
+	}
+	
+	/**
+	 * Gets the number from the formatted line of text 
+	 */
+	private String getNum(String line){
+		return line.split(" ")[1];
 	}
 	
 	/**
@@ -275,22 +280,87 @@ public class View implements ActionListener{
 		rps.close();
 	}
 	
-	/**
-	 * Appends text to the specified text pane
-	 */
-	private void append(JTextPane pane, String text){
-		Document doc = pane.getDocument();
-		try {
-			doc.insertString(doc.getLength(), text, null);
-		} catch (BadLocationException e) {
-			e.printStackTrace();
+	public void compareOnlyNumber(JTextPane rpTextPane, JTextPane stTextPane){
+		String rpText = rpTextPane.getText();
+		String stText = stTextPane.getText();
+
+		if (rpText.isEmpty() || !rpText.contains("I 0")) {
+			return;
 		}
+
+		// Shows what needs to be added to Map JSON
+		append(stTextPane, "\n\nAdd:\n");
+		Scanner rps = new Scanner(rpText);
+
+		while (rps.hasNextLine()) {
+			String line = rps.nextLine();
+			String num = getNum(line);
+			boolean hasNum = false;
+
+			Scanner sts = new Scanner(stText);
+
+			while (sts.hasNextLine()) {
+				String sLine = sts.nextLine();
+				if (sLine.contains(num)) {
+					hasNum = true;
+					break;
+				}
+			}
+			if (!hasNum) {
+				append(stTextPane, "I " + num + "\n");
+			}
+			sts.close();
+		}
+		rps.close();
+
+		// Shows what needs to be removed
+		append(stTextPane, "\nRemove:\n");
+		Scanner sts = new Scanner(stText);
+
+		while (sts.hasNextLine()) {
+			String line = sts.nextLine();
+			String num = getNum(line);
+			boolean hasNum = false;
+
+			rps = new Scanner(rpText);
+
+			while (rps.hasNextLine()) {
+				String rpLine = rps.nextLine();
+				if (rpLine.contains(num)) {
+					hasNum = true;
+					break;
+				}
+			}
+			if (!hasNum) {
+				append(stTextPane, line + "\n");
+			}
+			rps.close();
+		}
+		sts.close();
+		
+		
 	}
 	
-	/**
-	 * Gets the number from the formatted line of text 
-	 */
-	private String getNum(String line){
-		return line.split(" ")[1];
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if(e.getSource().equals(rpButton)){
+			rp.load();
+			rpTextPane.setText(rp.getText());
+			return;
+		}
+		
+		if(e.getSource().equals(jsButton)){
+			js.load();
+			jsTextPane.setText(js.getText());
+			compare(rpTextPane, jsTextPane);
+			return;
+		}
+		
+		if(e.getSource().equals(stButton)){
+			st.load();
+			stTextPane.setText(st.getText());
+			compareOnlyNumber(rpTextPane, stTextPane);
+			return;
+		}
 	}
 }

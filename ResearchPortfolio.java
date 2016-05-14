@@ -19,6 +19,8 @@ public class ResearchPortfolio extends Source{
 
 	@Override
 	public void load(){
+		this.clear();
+		
 		URL url = null;
 		try {
 			url = new URL(stringURL);

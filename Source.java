@@ -19,6 +19,13 @@ public abstract class Source {
 	public abstract void load();
 	
 	/**
+	 * Loads source to be parsed
+	 */
+	public void clear(){
+		output = "";
+	}
+	
+	/**
 	 * Returns parsed project text from the source 
 	 */
 	public String getText(){
