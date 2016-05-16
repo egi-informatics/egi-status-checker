@@ -40,12 +40,14 @@ public class View implements ActionListener{
 	private JButton jsButton;
 	private JButton stButton;
 	
+	JLabel rpTimestamp;
+	
 	ResearchPortfolio rp;
 	MapJS js;
 	MapStatic st;
 	
 	static final String rpURL = "http://egi.utah.edu/downloads/research_portfolio/EGI_Research_Portfolio.pdf";
-	static final String jsURL = "http://egi.utah.edu/api/research.json";
+	static final String jsURL = "http://egi.utah.edu/api/Research.json";
 	static final String stURL = "http://egi.utah.edu/research/current-projects/";
 	
 	//Frame size
@@ -86,8 +88,10 @@ public class View implements ActionListener{
 	private void setupBottom() {
 		bottom.setLayout(new BorderLayout());
 		JLabel versionText = new JLabel(version + "");
+		rpTimestamp = new JLabel("");
 		bottom.setBorder(BorderFactory.createEmptyBorder(0, SIDE, SIDE, SIDE));
 		bottom.add(versionText, BorderLayout.EAST);
+		bottom.add(rpTimestamp, BorderLayout.WEST);
 		frame.add(bottom, BorderLayout.SOUTH);
 	}
 
@@ -346,6 +350,8 @@ public class View implements ActionListener{
 		if(e.getSource().equals(rpButton)){
 			rp.load();
 			rpTextPane.setText(rp.getText());
+			String timestamp = rp.getTimestamp();
+			rpTimestamp.setText(timestamp);
 			return;
 		}
 		

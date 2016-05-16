@@ -1,5 +1,6 @@
 package statuschecker;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -12,6 +13,8 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
 public class ResearchPortfolio extends Source{
+	
+	private String timestamp = "";
 	
 	public ResearchPortfolio(String stringURL) {
 		super(stringURL);
@@ -32,31 +35,40 @@ public class ResearchPortfolio extends Source{
 			PDDocument doc = PDDocument.load(stream);
 
 			PDFTextStripper stripper = new PDFTextStripper();
+			loadTimestamp(stripper, doc);
 			int start = 3;
 			int end = doc.getNumberOfPages();
 			
 			String text = "";
+			String pageText = "";
 			
-			for(int i = start; i < end; i++){
+			for(int i = start; i <= end; i++){
 				stripper.setStartPage(i);
 				stripper.setEndPage(i);
-				String pageText = stripper.getText(doc);
+				pageText = stripper.getText(doc);
 				String line = getNumber(pageText) + "  " + getStatus(pageText);
 				if(line.length() > 3){
 					text += line + "\n";
 				}
 			}
 			
+//			stripper.setStartPage(11);
+//			stripper.setEndPage(11); //TODO bug on 11 doesn't find correct title. Finds first. Maybe should find last.
+//			System.out.println(pageText);
+			
 			output = sort(text);
+			//addTimeStamp();
 			stream.close();
 			doc.close();
 			
-//			stripper.setStartPage(11);
-//			stripper.setEndPage(11); //TODO bug on 11 doesn't find correct title. Finds first. Maybe should find last.
-//			System.out.println(stripper.getText(doc));
-			
 		} catch (IOException e) {
 			e.printStackTrace();
+			
+			if(e instanceof FileNotFoundException){
+				String message = "File not found";
+				showMessageDialog(null, message + e.getMessage());
+				return;
+			}
 			
 			String message = "Problem with file\n";
 			showMessageDialog(null, message + e.getMessage());
@@ -66,7 +78,7 @@ public class ResearchPortfolio extends Source{
 	/**
 	 * Returns the project I # from the input page text
 	 */
-	private static String getNumber(String pageText){
+	private String getNumber(String pageText){
 		Scanner sc = new Scanner(pageText);
 		while(sc.hasNextLine()){
 			String line = sc.nextLine();
@@ -86,7 +98,7 @@ public class ResearchPortfolio extends Source{
 	/**
 	 * Returns the project status from the input page text
 	 */
-	private static String getStatus(String pageText){
+	private String getStatus(String pageText){
 		Scanner sc = new Scanner(pageText);
 		
 		String dev = "In Development";
@@ -110,5 +122,28 @@ public class ResearchPortfolio extends Source{
 		}
 		sc.close();
 		return "";
+	}
+	
+	public String getTimestamp(){
+		return timestamp;
+	}
+	
+	private void loadTimestamp(PDFTextStripper stripper, PDDocument doc) throws IOException{
+		int page = 1;
+		stripper.setStartPage(page);
+		stripper.setEndPage(page);
+		
+		String pageText = stripper.getText(doc);
+		Scanner s = new Scanner(pageText);
+		
+		while(s.hasNextLine()){
+			String line = s.nextLine();
+			
+			if(line.contains(":") && (line.contains("AM") || line.contains("PM"))){
+				timestamp = line;
+				break;
+			}
+		}
+		s.close();
 	}
 }
