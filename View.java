@@ -47,7 +47,7 @@ public class View implements ActionListener{
 	MapStatic st;
 	
 	static final String rpURL = "http://egi.utah.edu/downloads/research_portfolio/EGI_Research_Portfolio.pdf";
-	static final String jsURL = "http://egi.utah.edu/api/Research.json";
+	static final String jsURL = "http://egi.utah.edu/api/research.json";
 	static final String stURL = "http://egi.utah.edu/research/current-projects/";
 	
 	//Frame size
