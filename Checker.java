@@ -17,10 +17,10 @@ import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
-public class View implements ActionListener{
+public class Checker implements ActionListener{
 	
 	public static void main(String[] args){
-		new View();
+		new Checker();
 	}
 
 	double version = 0.3;
@@ -65,7 +65,7 @@ public class View implements ActionListener{
 	static final int TEXT_PADDING = 10;
 	static final String FONT = "Courier";
 
-	public View(){
+	public Checker(){
 		frame = new JFrame("Project Status Checker");
 		frame.setSize(WIDTH, HEIGHT);
 		frame.setMinimumSize(frame.getSize());
