@@ -18,6 +18,10 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
 public class View implements ActionListener{
+	
+	public static void main(String[] args){
+		new View();
+	}
 
 	double version = 0.3;
 	JFrame frame;
