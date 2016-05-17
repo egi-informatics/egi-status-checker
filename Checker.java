@@ -33,29 +33,34 @@ public class Checker implements ActionListener{
 	private JPanel rpPanel;
 	private JPanel jsPanel;
 	private JPanel stPanel;
+	private JPanel ppPanel;
 	
 	//Text
 	JTextPane rpTextPane;
 	JTextPane jsTextPane;
 	JTextPane stTextPane;
+	JTextPane ppTextPane;
 	
 	//Buttons
 	private JButton rpButton;
 	private JButton jsButton;
 	private JButton stButton;
+	private JButton ppButton;
 	
 	JLabel rpTimestamp;
 	
 	ResearchPortfolio rp;
 	MapJS js;
 	MapStatic st;
+	ProjectPages pp;
 	
 	static final String rpURL = "http://egi.utah.edu/downloads/research_portfolio/EGI_Research_Portfolio.pdf";
 	static final String jsURL = "http://egi.utah.edu/api/research.json";
-	static final String stURL = "http://egi.utah.edu/research/current-projects/";
+	static final String stURL = "http://egi.utah.edu/research/current-projects/?mode=quick";
+	static final String ppURL = "http://egi.utah.edu/all/?mode=quick";
 	
 	//Frame size
-	static final int WIDTH = 800;
+	static final int WIDTH = 1000;
 	static final int HEIGHT = 800;
 	
 	static final int TOP = 10;
@@ -81,12 +86,21 @@ public class Checker implements ActionListener{
 		bottom = new JPanel();
 		setupBottom();
 		
-		
 		rp = new ResearchPortfolio(rpURL);
 		js = new MapJS(jsURL);
 		st = new MapStatic(stURL);
+		pp = new ProjectPages(ppURL);
 		
 		frame.setVisible(true);
+	}
+	
+	private void setupTop() {
+		top.setLayout(new GridLayout(1, 3));
+		setupRP();
+		setupJSON();
+		setupST();
+		setupPP();
+		frame.add(top, BorderLayout.CENTER);
 	}
 	
 	private void setupBottom() {
@@ -99,21 +113,13 @@ public class Checker implements ActionListener{
 		frame.add(bottom, BorderLayout.SOUTH);
 	}
 
-	private void setupTop() {
-		top.setLayout(new GridLayout(1, 3));
-		setupRP();
-		setupJSON();
-		setupST();
-		frame.add(top, BorderLayout.CENTER);
-	}
-
 	public void setupRP(){
 		rpPanel = new JPanel();
 		BorderLayout layout = new BorderLayout();
 		configureLayout(layout);
 		
 		rpPanel.setLayout(layout);
-		rpPanel.setBorder(BorderFactory.createEmptyBorder(TOP, SIDE, BOTTOM, SIDE));
+		rpPanel.setBorder(BorderFactory.createEmptyBorder(TOP, SIDE, BOTTOM, 0));
 		
 		rpButton = new JButton("Load Research Portfolio");
 		rpTextPane = new JTextPane();
@@ -129,7 +135,7 @@ public class Checker implements ActionListener{
 		configureLayout(layout);
 		
 		jsPanel.setLayout(layout);
-		jsPanel.setBorder(BorderFactory.createEmptyBorder(TOP, 0, BOTTOM, 0)); // no inner padding
+		jsPanel.setBorder(BorderFactory.createEmptyBorder(TOP, SIDE, BOTTOM, 0)); // no inner padding
 		
 		jsTextPane = new JTextPane();
 		jsButton = new JButton("Load Map JSON");
@@ -145,7 +151,7 @@ public class Checker implements ActionListener{
 		configureLayout(layout);
 		
 		stPanel.setLayout(layout);
-		stPanel.setBorder(BorderFactory.createEmptyBorder(TOP, SIDE, BOTTOM, SIDE));
+		stPanel.setBorder(BorderFactory.createEmptyBorder(TOP, SIDE, BOTTOM, 0));
 		
 		stTextPane = new JTextPane();
 		stButton = new JButton("Load Static Text Below Map");
@@ -153,6 +159,22 @@ public class Checker implements ActionListener{
 		configureButton(stButton, stPanel);
 		
 		top.add(stPanel);
+	}
+	
+	public void setupPP(){
+		ppPanel = new JPanel();
+		BorderLayout layout = new BorderLayout();
+		configureLayout(layout);
+		
+		ppPanel.setLayout(layout);
+		ppPanel.setBorder(BorderFactory.createEmptyBorder(TOP, SIDE, BOTTOM, SIDE));
+		
+		ppTextPane = new JTextPane();
+		ppButton = new JButton("Load All Project Pages");
+		configureText(ppTextPane, ppPanel);
+		configureButton(ppButton, ppPanel);
+		
+		top.add(ppPanel);
 	}
 	
 	private void configureLayout(BorderLayout layout) {
@@ -200,16 +222,24 @@ public class Checker implements ActionListener{
 	 * Compares two panes. Outputs the result to the second pane.<br>
 	 * Results include projects that need to be added, removed, or modified.
 	 */
-	private void compare(JTextPane rpTextPane, JTextPane jsTextPane) {
+	private void compare(JTextPane rpTextPane, JTextPane secondPane) {
 		String rpText = rpTextPane.getText();
-		String jsText = jsTextPane.getText();
+		String secondText = secondPane.getText();
 		
 		if(rpText.isEmpty() || !rpText.contains("I 0")){
 			return;
 		}
+		
+		if(secondText.isEmpty() || !rpText.contains("I 0")){
+			return;
+		}
+		
+		if(secondText.equals("Timed out")){
+			return;
+		}
 
 		// Shows what needs to be added to Map JSON
-		append(jsTextPane, "\n\nAdd:\n");
+		append(secondPane, "\n\nAdd:\n");
 		Scanner rps = new Scanner(rpText);
 
 		while (rps.hasNextLine()) {
@@ -217,28 +247,28 @@ public class Checker implements ActionListener{
 			String num = getNum(line);
 			boolean hasNum = false;
 
-			Scanner jps = new Scanner(jsText);
+			Scanner ss = new Scanner(secondText);
 
-			while (jps.hasNextLine()) {
-				String jsLine = jps.nextLine();
+			while (ss.hasNextLine()) {
+				String jsLine = ss.nextLine();
 				if (jsLine.contains(num)) {
 					hasNum = true;
 					break;
 				}
 			}
 			if (!hasNum) {
-				append(jsTextPane, line + "\n");
+				append(secondPane, line + "\n");
 			}
-			jps.close();
+			ss.close();
 		}
 		rps.close();
 
 		// Shows what needs to be removed
-		append(jsTextPane, "\nRemove:\n");
-		Scanner jps = new Scanner(jsText);
+		append(secondPane, "\nRemove:\n");
+		Scanner ss = new Scanner(secondText);
 
-		while (jps.hasNextLine()) {
-			String line = jps.nextLine();
+		while (ss.hasNextLine()) {
+			String line = ss.nextLine();
 			String num = getNum(line);
 			boolean hasNum = false;
 
@@ -252,14 +282,14 @@ public class Checker implements ActionListener{
 				}
 			}
 			if (!hasNum) {
-				append(jsTextPane, line + "\n");
+				append(secondPane, line + "\n");
 			}
 			rps.close();
 		}
-		jps.close();
+		ss.close();
 
 		// Shows what needs to be modified in the Map JSON
-		append(jsTextPane, "\nModify:\n");
+		append(secondPane, "\nModify:\n");
 		rps = new Scanner(rpText);
 
 		while (rps.hasNextLine()) {
@@ -268,10 +298,10 @@ public class Checker implements ActionListener{
 			boolean hasNum = false;
 			boolean statusMatch = false;
 
-			jps = new Scanner(jsText);
+			ss = new Scanner(secondText);
 
-			while (jps.hasNextLine()) {
-				String jsLine = jps.nextLine();
+			while (ss.hasNextLine()) {
+				String jsLine = ss.nextLine();
 				if (jsLine.contains(num)) {
 					hasNum = true;
 					if(rpLine.equals(jsLine)){
@@ -281,9 +311,9 @@ public class Checker implements ActionListener{
 				}
 			}
 			if (hasNum && !statusMatch) {
-				append(jsTextPane, rpLine + "\n");
+				append(secondPane, rpLine + "\n");
 			}
-			jps.close();
+			ss.close();
 		}
 		rps.close();
 	}
@@ -370,6 +400,13 @@ public class Checker implements ActionListener{
 			st.load();
 			stTextPane.setText(st.getText());
 			compareOnlyNumber(rpTextPane, stTextPane);
+			return;
+		}
+		
+		if(e.getSource().equals(ppButton)){
+			pp.load();
+			ppTextPane.setText(pp.getText());
+			compare(rpTextPane, ppTextPane);
 			return;
 		}
 	}
