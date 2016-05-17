@@ -1,48 +1,35 @@
 package statuschecker;
 
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.Scanner;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class ProjectPages extends Source {
 	
 	public static final int TIMEOUT = 14_000;
-	private String html = "";
 
-	public ProjectPages(String stringURL) {// https://egi.utah.edu/all/
+	public ProjectPages(String stringURL) {
 		super(stringURL);
 	}
 
 	@Override
 	public void load() {
-		String projects = "";
+		output = "";
 
 		Document doc;
-		try {
-			URL url = new URL(this.stringURL);
-			InputStream stream = url.openStream();
-			Scanner s = new Scanner(stream);
-			
-			while(s.hasNextLine()){
-				html += s.nextLine() + "\n";
-			}
-			
-			doc = Jsoup.parse(html);
+		try {			
+			doc = Jsoup.parse(new URL(stringURL), TIMEOUT);
 			Elements links = doc.select("#projects a");
 			
 			for (int i = 0; i < links.size(); i++){
 				loadPage(links.get(i).attr("href"));
 			}
 			
-			s.close();
 			// System.out.println(projects);
 
 		} catch (IOException e) {
