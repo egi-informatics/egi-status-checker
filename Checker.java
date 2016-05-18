@@ -250,8 +250,8 @@ public class Checker implements ActionListener{
 			Scanner ss = new Scanner(secondText);
 
 			while (ss.hasNextLine()) {
-				String jsLine = ss.nextLine();
-				if (jsLine.contains(num)) {
+				String secondLine = ss.nextLine();
+				if (num.equals(getNum(secondLine))) {
 					hasNum = true;
 					break;
 				}
@@ -276,7 +276,7 @@ public class Checker implements ActionListener{
 
 			while (rps.hasNextLine()) {
 				String rpLine = rps.nextLine();
-				if (rpLine.contains(num)) {
+				if (num.equals(getNum(rpLine))) {
 					hasNum = true;
 					break;
 				}
@@ -302,7 +302,7 @@ public class Checker implements ActionListener{
 
 			while (ss.hasNextLine()) {
 				String jsLine = ss.nextLine();
-				if (jsLine.contains(num)) {
+				if (num.equals(getNum(jsLine))) {
 					hasNum = true;
 					if(rpLine.equals(jsLine)){
 						statusMatch = true;
